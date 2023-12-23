@@ -23,8 +23,6 @@ def traverse(x, m):
     return x
 
 seeds = [int(x) for x in (f[0].split(": ")[1]).split()]
-# print(f[0].split(": ")[1])
-# print(seeds)
 q = math.inf
 maps = buildMaps(f)
 for seed in seeds:
@@ -32,7 +30,3 @@ for seed in seeds:
         seed = traverse(seed, m)
     q = min(q, seed)
 print(q)
-
-
-
-print(buildMaps(f))

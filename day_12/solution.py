@@ -4,46 +4,41 @@ from functools import lru_cache
 import numpy as np
 f = [x for x in open("input.txt").read().strip().split("\n")]
 
-@lru_cache()
-def recurse(s, groupsToFind):
-    # print("starting string is", s, "looking for these groups", groupsToFind)
-    # input("continue")
-    if len(groupsToFind) == 0 and ("#" not in s):
-        return 1
-    if (len(groupsToFind) == 0) != (len(s) == 0):
-        return 0
-    if s[0] == ".":
-        # print("found a dot, going to the next one", s, groupsToFind)
-        return recurse(s[1:], groupsToFind)
-    if s[0] == "?":
-        newS = "#" + s[1:]
-        newerS = "." + s[1:]
-        # print("found a ?, trying both possibilities")
-        return recurse(newS, groupsToFind) + recurse(newerS, groupsToFind)
-    if s[0] == "#":
-        lenICare = int(groupsToFind[0])
-        # print("found a #", "this is what i'm looking for: ", s, lenICare, s[:lenICare])
-        if len(s) >= lenICare and (lenICare == len(s) or s[lenICare] != "#") and "." not in set(s[:lenICare]):
-            # print("that was valid")
-            return recurse(s[lenICare + 1:], groupsToFind[1:])
-        # else:
-        #     print("that was not valid")
+# @lru_cache()
 
-    return 0
+DP = {}
+def recurse(s, b, s_index, b_index, curr_len):
+    key = (s_index, b_index, curr_len)
+    if key in DP:
+        return DP[key]
+    if s_index == len(s): #done with the string
+        if b_index == len(b) and curr_len == 0: #we finished all the groups and have no extra hashes
+            return 1
+        elif b_index == len(b) - 1 and curr_len == b[b_index]:
+            return 1
+        else:
+            return 0
+    ret = 0
+    for c in ".#":
+        if s[s_index] == c or s[s_index] == "?":
+            if c == "." and curr_len == 0:
+                ret += recurse(s, b, s_index + 1, b_index, curr_len) # move to the next character... not important
+            elif c == "." and curr_len > 0 and b_index < len(b) and curr_len == b[b_index]:
+                ret += recurse(s, b, s_index + 1, b_index + 1, 0) #we completed one, so move to the next character and restart
+            elif c == "#":
+                ret += recurse(s, b, s_index + 1, b_index, curr_len + 1)
+    DP[key] = ret
+    return ret
 
 
 q = 0
 for line in f:
     stuff, groups = line.split(" ")
     groups = [int(a) for a in groups.split(",")]
-    q += recurse(stuff, groups)
+
+    stuff = "?".join([stuff, stuff, stuff, stuff, stuff])
+    groups = groups * 5
+    DP.clear()
+    curr = recurse(stuff, groups, 0, 0, 0)
+    q += curr
 print(q)
-#
-# q = 0
-# for line in f:
-#     stuff, groups = line.split(" ")
-#     groups = [int(a) for a in groups.split(",")]
-#     print(stuff * 5)
-#     print(groups * 5)
-#     # q += recurse(stuff * 5, groups * 5)
-# print(q)

@@ -104,7 +104,7 @@ while left_to_match:
 
 
 
-def dfs(visited, vlist, curr, paths):
+def dfs(visited, curr, paths):
     if curr == target:
         return paths
 
@@ -113,13 +113,18 @@ def dfs(visited, vlist, curr, paths):
 
     max_path_length = 0
     visited.add(curr)
-    for neighbor, dist in adj_list[curr].items():
-        if neighbor not in visited:
-            path_length = dfs(visited, vlist + [curr], neighbor, paths + dist)
-            max_path_length = max(path_length, max_path_length)
+    if target in adj_list[curr].keys():
+        max_path_length = max(max_path_length, paths + adj_list[curr][target])
+    else:
+        for neighbor, dist in adj_list[curr].items():
+            if neighbor == target:  # Directly go to target if it's a neighbor
+                max_path_length = max(max_path_length, paths + dist)
+            if neighbor not in visited:
+                path_length = dfs(visited, neighbor, paths + dist)
+                max_path_length = max(path_length, max_path_length)
 
     visited.remove(curr)
     return max_path_length
 
 # print(adj_list)
-print(dfs(set(), [], start, 0))
+print(dfs(set(), start, 0))

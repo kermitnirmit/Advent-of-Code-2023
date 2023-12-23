@@ -1,3 +1,4 @@
+import time
 from collections import deque, defaultdict
 
 f = [x for x in open("input.txt").read().split("\n")]
@@ -29,36 +30,40 @@ dmap = {
 
 
 valid_paths = []
+start_time = time.time()
+def bfs(start):
+    q = deque([(start, 0, set())])
 
-# def bfs(start):
-#     q = deque([(start, 0, set())])
-#
-#     while q:
-#         curr, l, visited = q.popleft()
-#         if curr == target:
-#             valid_paths.append(l)
-#         if curr in visited:
-#             continue
-#         i, j = curr
-#         # visited.add(curr)
-#         if 0 <= i < len(f) and 0 <= j < len(f[0]):
-#             if f[i][j] == ".":
-#                 for di, dj in dirs_2d_4:
-#                     nvisited = visited.copy()
-#                     nvisited.add(curr)
-#                     q.append(((i + di, j + dj), l + 1, nvisited))
-#             if f[i][j] in "><v^":
-#                 di, dj = dmap[f[i][j]]
-#                 nvisited = visited.copy()
-#                 nvisited.add(curr)
-#                 q.append(((i + di, j + dj), l + 1, nvisited))
-#
-# bfs(start)
-# print(max(valid_paths))
+    while q:
+        curr, l, visited = q.popleft()
+        if curr == target:
+            valid_paths.append(l)
+        if curr in visited:
+            continue
+        i, j = curr
+        # visited.add(curr)
+        if 0 <= i < len(f) and 0 <= j < len(f[0]):
+            if f[i][j] == ".":
+                for di, dj in dirs_2d_4:
+                    nvisited = visited.copy()
+                    nvisited.add(curr)
+                    q.append(((i + di, j + dj), l + 1, nvisited))
+            if f[i][j] in "><v^":
+                di, dj = dmap[f[i][j]]
+                nvisited = visited.copy()
+                nvisited.add(curr)
+                q.append(((i + di, j + dj), l + 1, nvisited))
+
+bfs(start)
+print(max(valid_paths))
+end_time = time.time()
+
+print("p1 runtime", end_time - start_time)
 #
 decision_points = set()
 
 
+start_time = time.time()
 def lookup(i,j):
     if 0 <= i < len(f) and 0 <= j < len(f[0]):
         return f[i][j]
@@ -126,5 +131,7 @@ def dfs(visited, curr, paths):
     visited.remove(curr)
     return max_path_length
 
-# print(adj_list)
 print(dfs(set(), start, 0))
+end_time = time.time()
+
+print("p2 runtime", end_time-start_time)
